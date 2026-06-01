@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TheVenomWorld — Tienda</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #080a06;
+    --dark: #0d110a;
+    --card: #111508;
+    --card2: #151a10;
+    --green: #4aff3a;
+    --green-dim: #2aaa1e;
+    --green-glow: rgba(74,255,58,0.18);
+    --yellow: #f0d44a;
+    --yellow-dim: #a08a20;
+    --border: rgba(74,255,58,0.22);
+    --border2: rgba(240,212,74,0.18);
+    --text: #d4e8c2;
+    --text2: #7a9868;
+    --danger: #ff4a4a;
+    --white: #f0f5ec;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--black);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 16px;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  /* BG Pattern */
+  body::before {
+    content:'';
+    position:fixed;
+    inset:0;
+    background:
+      radial-gradient(ellipse 60% 40% at 50% 0%, rgba(74,255,58,0.07) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 30% at 80% 80%, rgba(240,212,74,0.05) 0%, transparent 60%);
+    pointer-events:none;
+    z-index:0;
+  }
+
+  /* ===== NAVBAR ===== */
+  nav {
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    background: rgba(8,10,6,0.92);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(12px);
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 0 2rem; height:64px;
+  }
+  .logo {
+    font-family:'Cinzel',serif;
+    font-size:1.4rem; font-weight:700;
+    color:var(--green);
+    letter-spacing:.1em;
+    text-shadow: 0 0 20px rgba(74,255,58,0.4);
+  }
+  .logo span { color:var(--yellow); }
+  .nav-links { display:flex; gap:1.5rem; align-items:center; }
+  .nav-links a {
+    color:var(--text2); text-decoration:none;
+    font-size:.95rem; font-weight:500; letter-spacing:.05em;
+    transition:color .2s;
+    cursor:pointer;
+  }
+  .nav-links a:hover, .nav-links a.active { color:var(--green); }
+  .nav-right { display:flex; align-items:center; gap:1rem; }
+  .btn-cart {
+    background:transparent; border:1px solid var(--border);
+    color:var(--green); padding:.45rem .9rem;
+    border-radius:4px; cursor:pointer; font-family:'Rajdhani',sans-serif;
+    font-size:.9rem; font-weight:600; letter-spacing:.05em;
+    transition:all .2s; position:relative;
+  }
+  .btn-cart:hover { background:var(--green-glow); border-color:var(--green); }
+  .cart-badge {
+    position:absolute; top:-6px; right:-6px;
+    background:var(--yellow); color:#000;
+    font-size:.65rem; font-weight:700;
+    width:18px; height:18px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    display:none;
+  }
+  .btn-profile {
+    background:var(--green); color:#000;
+    border:none; padding:.45rem 1rem;
+    border-radius:4px; cursor:pointer;
+    font-family:'Rajdhani',sans-serif;
+    font-size:.9rem; font-weight:700; letter-spacing:.05em;
+    transition:all .2s;
+  }
+  .btn-profile:hover { background:#6fff5a; }
+
+  /* ===== VIEWS ===== */
+  .view { display:none; padding-top:64px; min-height:100vh; position:relative; z-index:1; }
+  .view.active { display:block; }
+
+  /* ===== AUTH ===== */
+  #view-auth {
+    display:flex; align-items:center; justify-content:center;
+    min-height:100vh;
+  }
+  .auth-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius:8px;
+    padding:2.5rem;
+    width:100%; max-width:420px;
+    position:relative;
+    box-shadow: 0 0 40px rgba(74,255,58,0.08);
+  }
+  .auth-box::before {
+    content:'';
+    position:absolute; top:0; left:50%; transform:translateX(-50%);
+    width:60%; height:1px;
+    background: linear-gradient(90deg, transparent, var(--green), transparent);
+  }
+  .auth-logo {
+    font-family:'Cinzel',serif;
+    font-size:1.6rem; font-weight:700;
+    color:var(--green); text-align:center;
+    margin-bottom:.3rem;
+    text-shadow: 0 0 20px rgba(74,255,58,0.5);
+  }
+  .auth-logo span { color:var(--yellow); }
+  .auth-sub {
+    text-align:center; color:var(--text2);
+    font-size:.85rem; margin-bottom:2rem;
+  }
+  .auth-tabs { display:flex; border-bottom:1px solid var(--border); margin-bottom:1.5rem; }
+  .auth-tab {
+    flex:1; text-align:center; padding:.7rem;
+    color:var(--text2); cursor:pointer; font-weight:600;
+    font-size:.95rem; letter-spacing:.05em;
+    border-bottom:2px solid transparent; margin-bottom:-1px;
+    transition:all .2s;
+  }
+  .auth-tab.active { color:var(--green); border-bottom-color:var(--green); }
+  .field { margin-bottom:1.1rem; }
+  .field label {
+    display:block; font-size:.8rem; font-weight:600;
+    color:var(--text2); letter-spacing:.08em;
+    text-transform:uppercase; margin-bottom:.4rem;
+  }
+  .field input {
+    width:100%; background:rgba(74,255,58,0.04);
+    border:1px solid var(--border);
+    border-radius:4px; padding:.7rem 1rem;
+    color:var(--white); font-family:'Rajdhani',sans-serif;
+    font-size:1rem; transition:all .2s; outline:none;
+  }
+  .field input:focus { border-color:var(--green); box-shadow:0 0 0 3px rgba(74,255,58,0.1); }
+  .field-hint { font-size:.75rem; color:var(--text2); margin-top:.3rem; }
+  .btn-main {
+    width:100%; padding:.8rem;
+    background:var(--green); color:#000;
+    border:none; border-radius:4px; cursor:pointer;
+    font-family:'Cinzel',serif; font-size:1rem; font-weight:700;
+    letter-spacing:.08em; transition:all .2s; margin-top:.5rem;
+  }
+  .btn-main:hover { background:#6fff5a; transform:translateY(-1px); }
+  .btn-main:disabled { opacity:.5; cursor:not-allowed; transform:none; }
+  .err-msg {
+    background:rgba(255,74,74,0.1); border:1px solid rgba(255,74,74,0.3);
+    border-radius:4px; padding:.6rem 1rem;
+    color:var(--danger); font-size:.85rem; margin-bottom:1rem;
+    display:none;
+  }
+
+  /* Verification code view */
+  .code-box {
+    background:rgba(74,255,58,0.07);
+    border:1px solid var(--border);
+    border-radius:8px; padding:1.5rem; text-align:center;
+    margin-bottom:1.5rem;
+  }
+  .code-display {
+    font-family:'Cinzel',serif;
+    font-size:2.2rem; font-weight:700;
+    color:var(--green); letter-spacing:.3em;
+    text-shadow:0 0 20px rgba(74,255,58,0.6);
+  }
+  .code-instruction { font-size:.85rem; color:var(--text2); margin-top:.5rem; }
+
+  /* ===== STORE ===== */
+  .store-hero {
+    padding:3rem 2rem 2rem;
+    text-align:center;
+    border-bottom:1px solid var(--border);
+    margin-bottom:2rem;
+  }
+  .store-hero h1 {
+    font-family:'Cinzel',serif;
+    font-size:2.5rem; font-weight:700;
+    color:var(--green);
+    text-shadow:0 0 30px rgba(74,255,58,0.4);
+    margin-bottom:.5rem;
+  }
+  .store-hero p { color:var(--text2); font-size:1rem; }
+  .store-cats {
+    display:flex; justify-content:center; gap:1rem;
+    padding:0 2rem 2rem; flex-wrap:wrap;
+  }
+  .cat-btn {
+    background:transparent; border:1px solid var(--border);
+    color:var(--text2); padding:.6rem 1.8rem;
+    border-radius:4px; cursor:pointer;
+    font-family:'Rajdhani',sans-serif; font-size:1rem;
+    font-weight:600; letter-spacing:.08em;
+    transition:all .2s;
+  }
+  .cat-btn:hover, .cat-btn.active {
+    border-color:var(--green); color:var(--green);
+    background:var(--green-glow);
+  }
+  .cat-btn.yellow:hover, .cat-btn.yellow.active {
+    border-color:var(--yellow); color:var(--yellow);
+    background:rgba(240,212,74,0.1);
+  }
+  .products-grid {
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px,1fr));
+    gap:1.5rem; padding:0 2rem 4rem;
+    max-width:1200px; margin:0 auto;
+  }
+  .product-card {
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:8px; overflow:hidden;
+    transition:all .25s; cursor:pointer;
+    position:relative;
+  }
+  .product-card:hover {
+    transform:translateY(-4px);
+    border-color:var(--green);
+    box-shadow:0 8px 32px rgba(74,255,58,0.12);
+  }
+  .product-card.yellow-card:hover {
+    border-color:var(--yellow);
+    box-shadow:0 8px 32px rgba(240,212,74,0.12);
+  }
+  .badge-promo {
+    position:absolute; top:10px; right:10px;
+    background:var(--yellow); color:#000;
+    font-size:.7rem; font-weight:700;
+    padding:.2rem .6rem; border-radius:3px;
+    letter-spacing:.05em;
+  }
+  .card-img {
+    height:140px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:3.5rem;
+    border-bottom:1px solid var(--border);
+    background:rgba(74,255,58,0.03);
+  }
+  .card-img.yellow-bg { background:rgba(240,212,74,0.04); }
+  .card-body { padding:1.2rem; }
+  .card-cat {
+    font-size:.7rem; font-weight:700; letter-spacing:.12em;
+    text-transform:uppercase; color:var(--green-dim);
+    margin-bottom:.3rem;
+  }
+  .card-cat.yellow { color:var(--yellow-dim); }
+  .card-name {
+    font-family:'Cinzel',serif;
+    font-size:1.05rem; font-weight:600;
+    color:var(--white); margin-bottom:.5rem;
+  }
+  .card-desc { font-size:.85rem; color:var(--text2); line-height:1.5; margin-bottom:1rem; }
+  .card-footer { display:flex; align-items:center; justify-content:space-between; }
+  .card-price {
+    font-size:1.3rem; font-weight:700;
+    color:var(--green);
+  }
+  .card-price.yellow { color:var(--yellow); }
+  .card-price small {
+    font-size:.75rem; color:var(--text2);
+    text-decoration:line-through; margin-right:.3rem;
+    font-weight:400;
+  }
+  .btn-add {
+    background:transparent; border:1px solid var(--green);
+    color:var(--green); padding:.4rem .9rem;
+    border-radius:4px; cursor:pointer;
+    font-family:'Rajdhani',sans-serif; font-size:.85rem;
+    font-weight:700; letter-spacing:.05em; transition:all .2s;
+  }
+  .btn-add:hover { background:var(--green); color:#000; }
+  .btn-add.yellow-btn { border-color:var(--yellow); color:var(--yellow); }
+  .btn-add.yellow-btn:hover { background:var(--yellow); color:#000; }
+
+  /* ===== CART PANEL ===== */
+  .cart-overlay {
+    display:none; position:fixed; inset:0;
+    background:rgba(0,0,0,0.7); z-index:200;
+  }
+  .cart-overlay.open { display:block; }
+  .cart-panel {
+    position:fixed; top:0; right:0; bottom:0; width:380px;
+    background:var(--dark); border-left:1px solid var(--border);
+    z-index:201; display:flex; flex-direction:column;
+    transform:translateX(100%); transition:transform .3s ease;
+  }
+  .cart-panel.open { transform:translateX(0); }
+  .cart-header {
+    padding:1.5rem; border-bottom:1px solid var(--border);
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .cart-header h2 {
+    font-family:'Cinzel',serif; font-size:1.2rem;
+    color:var(--green);
+  }
+  .btn-close-cart {
+    background:transparent; border:1px solid var(--border);
+    color:var(--text2); width:32px; height:32px;
+    border-radius:4px; cursor:pointer; font-size:1.1rem;
+    transition:all .2s;
+  }
+  .btn-close-cart:hover { border-color:var(--danger); color:var(--danger); }
+  .cart-items { flex:1; overflow-y:auto; padding:1rem 1.5rem; }
+  .cart-empty {
+    text-align:center; color:var(--text2);
+    padding:3rem 0; font-size:.95rem;
+  }
+  .cart-item {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:6px; padding:1rem; margin-bottom:.8rem;
+    display:flex; gap:1rem; align-items:center;
+  }
+  .cart-item-icon { font-size:2rem; }
+  .cart-item-info { flex:1; }
+  .cart-item-name { font-weight:600; font-size:.95rem; color:var(--white); }
+  .cart-item-price { color:var(--green); font-weight:700; font-size:.9rem; }
+  .btn-remove-item {
+    background:transparent; border:none;
+    color:var(--text2); cursor:pointer; font-size:1.1rem;
+    transition:color .2s; padding:.2rem;
+  }
+  .btn-remove-item:hover { color:var(--danger); }
+  .cart-footer { padding:1.5rem; border-top:1px solid var(--border); }
+  .cart-total {
+    display:flex; justify-content:space-between;
+    margin-bottom:1rem; font-size:1.1rem;
+  }
+  .cart-total span:last-child { color:var(--green); font-weight:700; font-size:1.3rem; }
+  .btn-checkout {
+    width:100%; padding:.85rem;
+    background:var(--green); color:#000;
+    border:none; border-radius:4px; cursor:pointer;
+    font-family:'Cinzel',serif; font-size:1rem; font-weight:700;
+    letter-spacing:.08em; transition:all .2s;
+  }
+  .btn-checkout:hover { background:#6fff5a; }
+
+  /* ===== CHECKOUT MODAL ===== */
+  .modal-bg {
+    display:none; position:fixed; inset:0;
+    background:rgba(0,0,0,0.85); z-index:300;
+    align-items:center; justify-content:center;
+  }
+  .modal-bg.open { display:flex; }
+  .modal {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:10px; padding:2rem;
+    width:100%; max-width:480px; max-height:90vh;
+    overflow-y:auto; position:relative;
+  }
+  .modal h2 {
+    font-family:'Cinzel',serif; color:var(--green);
+    font-size:1.3rem; margin-bottom:1.5rem;
+  }
+  .modal-section { margin-bottom:1.5rem; }
+  .modal-section h3 {
+    font-size:.8rem; font-weight:700; color:var(--text2);
+    letter-spacing:.1em; text-transform:uppercase;
+    margin-bottom:.8rem; padding-bottom:.5rem;
+    border-bottom:1px solid var(--border);
+  }
+  .order-item-row {
+    display:flex; justify-content:space-between;
+    font-size:.9rem; padding:.3rem 0;
+    border-bottom:1px solid rgba(74,255,58,0.06);
+  }
+  .order-item-row:last-child { border:none; }
+  .order-total-row {
+    display:flex; justify-content:space-between;
+    font-size:1.1rem; font-weight:700; padding-top:.8rem;
+    margin-top:.5rem; border-top:1px solid var(--border);
+  }
+  .order-total-row span:last-child { color:var(--green); }
+  .payment-methods { display:grid; grid-template-columns:1fr 1fr; gap:.8rem; }
+  .payment-method {
+    border:1px solid var(--border); border-radius:6px;
+    padding:1rem; text-align:center; cursor:pointer;
+    transition:all .2s;
+  }
+  .payment-method:hover { border-color:var(--green); }
+  .payment-method.selected { border-color:var(--green); background:var(--green-glow); }
+  .payment-method .pm-icon { font-size:1.8rem; margin-bottom:.3rem; }
+  .payment-method .pm-name { font-size:.85rem; font-weight:600; }
+  .payment-method .pm-detail { font-size:.7rem; color:var(--text2); margin-top:.2rem; }
+  .info-box {
+    background:rgba(240,212,74,0.08); border:1px solid var(--border2);
+    border-radius:6px; padding:1rem; font-size:.85rem;
+    color:var(--text2); margin-top:1rem; line-height:1.6;
+  }
+  .info-box strong { color:var(--yellow); }
+  .modal-actions { display:flex; gap:.8rem; margin-top:1.5rem; }
+  .btn-cancel {
+    flex:1; padding:.75rem;
+    background:transparent; border:1px solid var(--border);
+    color:var(--text2); border-radius:4px; cursor:pointer;
+    font-family:'Rajdhani',sans-serif; font-size:1rem;
+    font-weight:600; letter-spacing:.05em; transition:all .2s;
+  }
+  .btn-cancel:hover { border-color:var(--danger); color:var(--danger); }
+  .btn-confirm {
+    flex:2; padding:.75rem;
+    background:var(--green); color:#000;
+    border:none; border-radius:4px; cursor:pointer;
+    font-family:'Cinzel',serif; font-size:1rem; font-weight:700;
+    letter-spacing:.08em; transition:all .2s;
+  }
+  .btn-confirm:hover { background:#6fff5a; }
+  .btn-confirm:disabled { opacity:.5; cursor:not-allowed; }
+
+  /* ===== PROFILE ===== */
+  .profile-container { max-width:800px; margin:0 auto; padding:2rem; }
+  .profile-header {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:8px; padding:2rem;
+    display:flex; gap:1.5rem; align-items:center;
+    margin-bottom:1.5rem;
+  }
+  .avatar {
+    width:72px; height:72px; border-radius:50%;
+    background:var(--green-glow); border:2px solid var(--green);
+    display:flex; align-items:center; justify-content:center;
+    font-size:2rem;
+  }
+  .profile-info h2 {
+    font-family:'Cinzel',serif; font-size:1.4rem;
+    color:var(--green); margin-bottom:.2rem;
+  }
+  .profile-info p { color:var(--text2); font-size:.9rem; }
+  .profile-stats {
+    display:grid; grid-template-columns:repeat(3,1fr); gap:1rem;
+    margin-bottom:1.5rem;
+  }
+  .stat-card {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:8px; padding:1.2rem; text-align:center;
+  }
+  .stat-val {
+    font-family:'Cinzel',serif; font-size:1.8rem;
+    font-weight:700; color:var(--green);
+  }
+  .stat-label { font-size:.8rem; color:var(--text2); letter-spacing:.05em; }
+  .orders-section {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:8px; padding:1.5rem;
+  }
+  .orders-section h3 {
+    font-family:'Cinzel',serif; font-size:1.1rem;
+    color:var(--yellow); margin-bottom:1.2rem;
+  }
+  .order-row {
+    display:flex; align-items:center; gap:1rem;
+    padding:.9rem 0; border-bottom:1px solid var(--border);
+  }
+  .order-row:last-child { border:none; }
+  .order-status {
+    padding:.25rem .7rem; border-radius:3px;
+    font-size:.75rem; font-weight:700; letter-spacing:.05em;
+  }
+  .status-pending {
+    background:rgba(240,212,74,0.15); color:var(--yellow);
+    border:1px solid rgba(240,212,74,0.3);
+  }
+  .status-completed {
+    background:rgba(74,255,58,0.1); color:var(--green);
+    border:1px solid var(--border);
+  }
+  .status-rejected {
+    background:rgba(255,74,74,0.1); color:var(--danger);
+    border:1px solid rgba(255,74,74,0.3);
+  }
+
+  /* NOTIFICATIONS */
+  .notif-dropdown {
+    position:absolute; top:64px; right:1rem;
+    background:var(--dark); border:1px solid var(--border);
+    border-radius:8px; width:320px;
+    box-shadow:0 8px 32px rgba(0,0,0,0.5);
+    display:none; z-index:150;
+  }
+  .notif-dropdown.open { display:block; }
+  .notif-header {
+    padding:1rem 1.2rem; border-bottom:1px solid var(--border);
+    font-family:'Cinzel',serif; font-size:.95rem; color:var(--green);
+  }
+  .notif-item {
+    padding:.9rem 1.2rem; border-bottom:1px solid rgba(74,255,58,0.06);
+    font-size:.85rem; line-height:1.5;
+  }
+  .notif-item:last-child { border:none; }
+  .notif-item.unread { background:rgba(74,255,58,0.04); }
+  .notif-time { font-size:.72rem; color:var(--text2); margin-top:.2rem; }
+
+  /* NOTIFICATIONS BELL */
+  .btn-notif {
+    background:transparent; border:1px solid var(--border);
+    color:var(--text2); width:38px; height:38px;
+    border-radius:4px; cursor:pointer; font-size:1.1rem;
+    transition:all .2s; position:relative;
+  }
+  .btn-notif:hover { border-color:var(--green); color:var(--green); }
+  .notif-badge {
+    position:absolute; top:-5px; right:-5px;
+    background:var(--danger); color:#fff;
+    font-size:.6rem; font-weight:700;
+    width:16px; height:16px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    display:none;
+  }
+
+  .toast {
+    position:fixed; bottom:2rem; right:2rem;
+    background:var(--card); border:1px solid var(--green);
+    border-radius:6px; padding:1rem 1.5rem;
+    color:var(--green); font-weight:600;
+    z-index:999; transform:translateY(100px);
+    transition:transform .3s ease;
+    box-shadow:0 4px 20px rgba(74,255,58,0.15);
+  }
+  .toast.show { transform:translateY(0); }
+  .toast.error { border-color:var(--danger); color:var(--danger); }
+
+  .section-hidden { display:none; }
+
+  /* Password strength */
+  .pw-strength { display:flex; gap:4px; margin-top:.4rem; }
+  .pw-bar {
+    flex:1; height:3px; border-radius:2px;
+    background:rgba(74,255,58,0.1); transition:background .3s;
+  }
+  .pw-bar.weak { background:var(--danger); }
+  .pw-bar.medium { background:var(--yellow); }
+  .pw-bar.strong { background:var(--green); }
+
+  @media(max-width:600px) {
+    .cart-panel { width:100%; }
+    .store-hero h1 { font-size:1.8rem; }
+    .profile-stats { grid-template-columns:1fr 1fr; }
+    nav { padding:0 1rem; }
+    .products-grid { padding:0 1rem 4rem; }
+    .logo { font-size:1.1rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <div class="logo">THE<span>VENOM</span>WORLD</div>
+  <div class="nav-links" id="nav-store-links" style="display:none">
+    <a onclick="showCat('rangos')" class="active" id="nl-rangos">⚔️ Rangos</a>
+    <a onclick="showCat('kits')" id="nl-kits">🎒 Kits</a>
+    <a onclick="showCat('llaves')" id="nl-llaves">🔑 Llaves</a>
+    <a onclick="showView('profile')" id="nl-profile">Mi Perfil</a>
+  </div>
+  <div class="nav-right" id="nav-right-auth" style="display:none">
+    <button class="btn-notif" id="btn-notif" onclick="toggleNotif()">🔔<span class="notif-badge" id="notif-badge">0</span></button>
+    <button class="btn-cart" onclick="toggleCart()">🛒 Carrito<span class="cart-badge" id="cart-badge">0</span></button>
+    <button class="btn-profile" onclick="logoutUser()">Salir</button>
+  </div>
+</nav>
+
+<!-- NOTIFICATIONS DROPDOWN -->
+<div class="notif-dropdown" id="notif-dropdown">
+  <div class="notif-header">🔔 Notificaciones</div>
+  <div id="notif-list">
+    <div class="notif-item" style="color:var(--text2);font-size:.85rem">No hay notificaciones.</div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ===== VIEW: AUTH ===== -->
+<div class="view active" id="view-auth">
+  <div class="auth-box">
+    <div class="auth-logo">THE<span>VENOM</span>WORLD</div>
+    <p class="auth-sub">Servidor Minecraft — Tienda Oficial</p>
+
+    <!-- Step 1: Login/Register tabs -->
+    <div id="auth-step1">
+      <div class="auth-tabs">
+        <div class="auth-tab active" id="tab-login" onclick="switchTab('login')">Iniciar Sesión</div>
+        <div class="auth-tab" id="tab-reg" onclick="switchTab('register')">Registrarse</div>
+      </div>
+      <div class="err-msg" id="auth-err"></div>
+
+      <!-- LOGIN -->
+      <div id="form-login">
+        <div class="field">
+          <label>Usuario de Minecraft</label>
+          <input type="text" id="l-user" placeholder="TuNickEnElServer">
+        </div>
+        <div class="field">
+          <label>Contraseña</label>
+          <input type="password" id="l-pass" placeholder="••••••••">
+        </div>
+        <button class="btn-main" onclick="doLogin()">ENTRAR AL SERVIDOR</button>
+      </div>
+
+      <!-- REGISTER -->
+      <div id="form-register" style="display:none">
+        <div class="field">
+          <label>Nick de Minecraft</label>
+          <input type="text" id="r-user" placeholder="TuNickExacto">
+          <div class="field-hint">Debe ser tu nombre de usuario exacto en el servidor</div>
+        </div>
+        <div class="field">
+          <label>Contraseña</label>
+          <input type="password" id="r-pass" placeholder="Mínimo 8 caracteres" oninput="checkPw(this.value)">
+          <div class="pw-strength">
+            <div class="pw-bar" id="pb1"></div>
+            <div class="pw-bar" id="pb2"></div>
+            <div class="pw-bar" id="pb3"></div>
+            <div class="pw-bar" id="pb4"></div>
+          </div>
+          <div class="field-hint">Mínimo 8 caracteres, 1 número y 1 mayúscula</div>
+        </div>
+        <div class="field">
+          <label>Confirmar Contraseña</label>
+          <input type="password" id="r-pass2" placeholder="Repite tu contraseña">
+        </div>
+        <button class="btn-main" onclick="doRegister()">CREAR CUENTA</button>
+      </div>
+    </div>
+
+    <!-- Step 2: Verification code -->
+    <div id="auth-step2" style="display:none">
+      <h3 style="font-family:'Cinzel',serif;color:var(--yellow);font-size:1.1rem;margin-bottom:1rem;text-align:center">¡Cuenta creada!</h3>
+      <div class="code-box">
+        <div class="code-display" id="verify-code">------</div>
+        <div class="code-instruction">Escribe este código en el servidor de Minecraft:<br><strong style="color:var(--green)">/verificar CÓDIGO</strong></div>
+      </div>
+      <p style="font-size:.85rem;color:var(--text2);text-align:center;margin-bottom:1.5rem">Una vez verificado, podrás iniciar sesión con tu usuario y contraseña.</p>
+      <button class="btn-main" onclick="goToLogin()">YA LO INGRESÉ — IR A LOGIN</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== VIEW: STORE ===== -->
+<div class="view" id="view-store">
+  <div class="store-hero">
+    <h1>⚔️ TIENDA OFICIAL</h1>
+    <p>Potencia tu experiencia en TheVenomWorld</p>
+  </div>
+  <div class="store-cats">
+    <button class="cat-btn active" id="cb-rangos" onclick="showCat('rangos')">⚔️ RANGOS</button>
+    <button class="cat-btn yellow" id="cb-kits" onclick="showCat('kits')">🎒 KITS</button>
+    <button class="cat-btn" id="cb-llaves" onclick="showCat('llaves')">🔑 LLAVES</button>
+  </div>
+  <div class="products-grid" id="products-grid">
+    <!-- filled by JS -->
+  </div>
+</div>
+
+<!-- ===== VIEW: PROFILE ===== -->
+<div class="view" id="view-profile">
+  <div class="profile-container">
+    <div class="profile-header">
+      <div class="avatar">🎮</div>
+      <div class="profile-info">
+        <h2 id="prof-name">Jugador</h2>
+        <p id="prof-status">Estado: <span style="color:var(--green)">Activo</span></p>
+        <p id="prof-join" style="margin-top:.3rem"></p>
+      </div>
+    </div>
+    <div class="profile-stats">
+      <div class="stat-card">
+        <div class="stat-val" id="stat-orders">0</div>
+        <div class="stat-label">Órdenes Totales</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" id="stat-spent" style="color:var(--yellow)">$0</div>
+        <div class="stat-label">Total Gastado</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" id="stat-rank" style="color:var(--yellow)">—</div>
+        <div class="stat-label">Rango Activo</div>
+      </div>
+    </div>
+    <div class="orders-section">
+      <h3>📋 MIS ÓRDENES</h3>
+      <div id="orders-list">
+        <p style="color:var(--text2);font-size:.9rem">No tienes órdenes aún. ¡Ve a la tienda!</p>
+      </div>
+    </div>
+    <div style="margin-top:1rem;text-align:center">
+      <button onclick="showView('store')" style="background:transparent;border:1px solid var(--border);color:var(--text2);padding:.7rem 2rem;border-radius:4px;cursor:pointer;font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:600;letter-spacing:.05em">← IR A LA TIENDA</button>
+    </div>
+  </div>
+</div>
+
+<!-- CART OVERLAY -->
+<div class="cart-overlay" id="cart-overlay" onclick="toggleCart()"></div>
+
+<!-- CART PANEL -->
+<div class="cart-panel" id="cart-panel">
+  <div class="cart-header">
+    <h2>🛒 CARRITO</h2>
+    <button class="btn-close-cart" onclick="toggleCart()">✕</button>
+  </div>
+  <div class="cart-items" id="cart-items-list">
+    <div class="cart-empty">Tu carrito está vacío</div>
+  </div>
+  <div class="cart-footer">
+    <div class="cart-total">
+      <span>Total:</span>
+      <span id="cart-total-price">$0.00 USD</span>
+    </div>
+    <button class="btn-checkout" onclick="openCheckout()">PROCEDER AL PAGO →</button>
+  </div>
+</div>
+
+<!-- CHECKOUT MODAL -->
+<div class="modal-bg" id="modal-checkout">
+  <div class="modal">
+    <h2>🧾 CONFIRMAR ORDEN</h2>
+    <div class="modal-section">
+      <h3>Productos</h3>
+      <div id="checkout-items"></div>
+    </div>
+    <div class="modal-section">
+      <h3>Método de Pago</h3>
+      <div class="payment-methods">
+        <div class="payment-method selected" id="pm-nequi" onclick="selectPM('nequi')">
+          <div class="pm-icon">📱</div>
+          <div class="pm-name">Nequi</div>
+          <div class="pm-detail">3213xxxxxxx</div>
+        </div>
+        <div class="payment-method" id="pm-bancolombia" onclick="selectPM('bancolombia')">
+          <div class="pm-icon">🏦</div>
+          <div class="pm-name">Bancolombia</div>
+          <div class="pm-detail">Transferencia</div>
+        </div>
+        <div class="payment-method" id="pm-paypal" onclick="selectPM('paypal')">
+          <div class="pm-icon">💳</div>
+          <div class="pm-name">PayPal</div>
+          <div class="pm-detail">Internacional</div>
+        </div>
+        <div class="payment-method" id="pm-binance" onclick="selectPM('binance')">
+          <div class="pm-icon">🪙</div>
+          <div class="pm-name">Binance/Crypto</div>
+          <div class="pm-detail">USDT/BTC</div>
+        </div>
+      </div>
+      <div class="info-box">
+        <strong>⚠️ Importante:</strong> Después de confirmar, envía tu comprobante de pago al Discord del servidor. Un administrador aprobará tu orden y recibirás tus items en el juego en menos de 24h.
+      </div>
+    </div>
+    <div class="modal-section">
+      <div class="order-total-row">
+        <span>TOTAL A PAGAR:</span>
+        <span id="checkout-total">$0.00 USD</span>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeCheckout()">Cancelar</button>
+      <button class="btn-confirm" id="btn-confirm-order" onclick="confirmOrder()">CONFIRMAR ORDEN ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase & App Script -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, setDoc, getDoc, collection, addDoc, query, where, getDocs, updateDoc, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC25XfAbfWh7grYkuJ65dMD-2NpaTVxCLE",
+  authDomain: "tienda-f4d0d.firebaseapp.com",
+  projectId: "tienda-f4d0d",
+  storageBucket: "tienda-f4d0d.firebasestorage.app",
+  messagingSenderId: "42726936222",
+  appId: "1:42726936222:web:ea590b164f89c7f6bfb58f"
+};
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// ===== STATE =====
+let currentUser = null;
+let cart = [];
+let selectedPM = 'nequi';
+let currentCat = 'rangos';
+
+// ===== PRODUCTS (loaded from Firestore or defaults) =====
+let PRODUCTS = [];
+const DEFAULT_PRODUCTS = [
+  { id:'r1', cat:'rangos', name:'Rango VIP', icon:'⭐', desc:'Acceso a comandos exclusivos, /fly en spawn, prefijo VIP dorado', price:5.99, color:'green' },
+  { id:'r2', cat:'rangos', name:'Rango MVP', icon:'💎', desc:'Todo lo del VIP + kit mensual, /nick, acceso a zonas exclusivas', price:12.99, oldPrice:15.99, color:'green', promo:'OFERTA' },
+  { id:'r3', cat:'rangos', name:'Rango LEGEND', icon:'👑', desc:'El rango más alto. Todos los beneficios + partículas únicas, mascota', price:24.99, color:'yellow' },
+  { id:'k1', cat:'kits', name:'Kit Guerrero', icon:'⚔️', desc:'Armadura de hierro encantada, espada, comida y pociones de combate', price:2.99, color:'yellow' },
+  { id:'k2', cat:'kits', name:'Kit Constructor', icon:'🏗️', desc:'500 bloques variados, herramientas diamante, andamios y más', price:3.99, color:'yellow' },
+  { id:'k3', cat:'kits', name:'Kit Survival Pro', icon:'🌿', desc:'Todo lo necesario para sobrevivir: armadura, comida, herramientas', price:4.99, oldPrice:6.99, color:'yellow', promo:'SALE' },
+  { id:'l1', cat:'llaves', name:'Llave Común', icon:'🔑', desc:'Abre cofres de recompensa con items básicos y dinero en el juego', price:1.99, color:'green' },
+  { id:'l2', cat:'llaves', name:'Llave Rara', icon:'🗝️', desc:'Recompensas raras: items encantados, materiales preciosos, monedas', price:3.99, color:'yellow' },
+  { id:'l3', cat:'llaves', name:'Llave Legendaria', icon:'✨', desc:'Recompensas épicas: rangos temporales, items únicos, grandes cantidades', price:7.99, color:'yellow', promo:'TOP' },
+];
+
+// load products from firestore
+async function loadProducts() {
+  try {
+    const snap = await getDocs(collection(db, 'products'));
+    if (!snap.empty) {
+      PRODUCTS = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    } else {
+      PRODUCTS = DEFAULT_PRODUCTS;
+      // seed defaults
+      for (const p of DEFAULT_PRODUCTS) {
+        await setDoc(doc(db, 'products', p.id), p);
+      }
+    }
+    renderProducts();
+  } catch(e) {
+    PRODUCTS = DEFAULT_PRODUCTS;
+    renderProducts();
+  }
+}
+
+// expose globals
+window.switchTab = switchTab;
+window.doLogin = doLogin;
+window.doRegister = doRegister;
+window.goToLogin = goToLogin;
+window.logoutUser = logoutUser;
+window.showCat = showCat;
+window.showView = showView;
+window.toggleCart = toggleCart;
+window.toggleNotif = toggleNotif;
+window.removeFromCart = removeFromCart;
+window.openCheckout = openCheckout;
+window.closeCheckout = closeCheckout;
+window.selectPM = selectPM;
+window.confirmOrder = confirmOrder;
+window.addToCart = addToCart;
+window.checkPw = checkPw;
+
+function showToast(msg, err=false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (err ? ' error' : '');
+  setTimeout(() => t.className = 'toast', 3000);
+}
+
+function showAuthErr(msg) {
+  const el = document.getElementById('auth-err');
+  el.textContent = msg; el.style.display = 'block';
+}
+function hideAuthErr() {
+  document.getElementById('auth-err').style.display = 'none';
+}
+
+function switchTab(tab) {
+  document.getElementById('form-login').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('form-register').style.display = tab === 'register' ? 'block' : 'none';
+  document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+  document.getElementById('tab-reg').classList.toggle('active', tab === 'register');
+  hideAuthErr();
+}
+
+function checkPw(val) {
+  const bars = ['pb1','pb2','pb3','pb4'];
+  let score = 0;
+  if (val.length >= 8) score++;
+  if (/[A-Z]/.test(val)) score++;
+  if (/[0-9]/.test(val)) score++;
+  if (/[^A-Za-z0-9]/.test(val)) score++;
+  bars.forEach((id, i) => {
+    const el = document.getElementById(id);
+    el.className = 'pw-bar';
+    if (i < score) {
+      if (score <= 1) el.classList.add('weak');
+      else if (score <= 2) el.classList.add('medium');
+      else el.classList.add('strong');
+    }
+  });
+}
+
+function generateCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code = '';
+  for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
+  return code;
+}
+
+async function doRegister() {
+  hideAuthErr();
+  const username = document.getElementById('r-user').value.trim();
+  const pass = document.getElementById('r-pass').value;
+  const pass2 = document.getElementById('r-pass2').value;
+
+  if (!username) return showAuthErr('Ingresa tu nick de Minecraft');
+  if (pass.length < 8) return showAuthErr('La contraseña debe tener mínimo 8 caracteres');
+  if (!/[A-Z]/.test(pass)) return showAuthErr('La contraseña debe tener al menos una mayúscula');
+  if (!/[0-9]/.test(pass)) return showAuthErr('La contraseña debe tener al menos un número');
+  if (pass !== pass2) return showAuthErr('Las contraseñas no coinciden');
+
+  try {
+    const userRef = doc(db, 'users', username.toLowerCase());
+    const snap = await getDoc(userRef);
+    if (snap.exists()) return showAuthErr('Ese nick ya está registrado');
+
+    // simple hash (not secure for prod — use Firebase Auth in production)
+    const passHash = btoa(pass + username);
+    const verifyCode = generateCode();
+
+    await setDoc(userRef, {
+      username, usernameLower: username.toLowerCase(),
+      passHash, verifyCode,
+      verified: false,
+      role: 'player',
+      rank: null,
+      createdAt: serverTimestamp(),
+      totalSpent: 0,
+      totalOrders: 0,
+    });
+
+    document.getElementById('verify-code').textContent = verifyCode;
+    document.getElementById('auth-step1').style.display = 'none';
+    document.getElementById('auth-step2').style.display = 'block';
+  } catch(e) {
+    showAuthErr('Error al registrar. Intenta de nuevo.');
+  }
+}
+
+function goToLogin() {
+  document.getElementById('auth-step1').style.display = 'block';
+  document.getElementById('auth-step2').style.display = 'none';
+  switchTab('login');
+}
+
+async function doLogin() {
+  hideAuthErr();
+  const username = document.getElementById('l-user').value.trim();
+  const pass = document.getElementById('l-pass').value;
+  if (!username || !pass) return showAuthErr('Completa todos los campos');
+
+  try {
+    const userRef = doc(db, 'users', username.toLowerCase());
+    const snap = await getDoc(userRef);
+    if (!snap.exists()) return showAuthErr('Usuario no encontrado');
+
+    const data = snap.data();
+    const passHash = btoa(pass + data.username);
+    if (passHash !== data.passHash) return showAuthErr('Contraseña incorrecta');
+    if (!data.verified) return showAuthErr('Debes verificar tu cuenta en el servidor primero. Usa /verificar ' + data.verifyCode);
+
+    currentUser = { id: username.toLowerCase(), ...data };
+    localStorage.setItem('tvw_user', username.toLowerCase());
+    enterStore();
+  } catch(e) {
+    showAuthErr('Error al iniciar sesión. Intenta de nuevo.');
+  }
+}
+
+function enterStore() {
+  document.getElementById('view-auth').classList.remove('active');
+  document.getElementById('view-store').classList.add('active');
+  document.getElementById('nav-store-links').style.display = 'flex';
+  document.getElementById('nav-right-auth').style.display = 'flex';
+  loadProducts();
+  loadNotifications();
+}
+
+function logoutUser() {
+  currentUser = null;
+  cart = [];
+  localStorage.removeItem('tvw_user');
+  location.reload();
+}
+
+// Auto-login
+async function tryAutoLogin() {
+  const saved = localStorage.getItem('tvw_user');
+  if (!saved) return;
+  try {
+    const snap = await getDoc(doc(db, 'users', saved));
+    if (snap.exists() && snap.data().verified) {
+      currentUser = { id: saved, ...snap.data() };
+      enterStore();
+    }
+  } catch(e) {}
+}
+
+function showView(v) {
+  document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+  document.getElementById('view-' + v).classList.add('active');
+  if (v === 'profile') loadProfile();
+  if (v === 'store') renderProducts();
+}
+
+function showCat(cat) {
+  currentCat = cat;
+  ['rangos','kits','llaves'].forEach(c => {
+    document.getElementById('cb-'+c).classList.toggle('active', c === cat);
+    const nl = document.getElementById('nl-'+c);
+    if (nl) nl.classList.toggle('active', c === cat);
+  });
+  renderProducts();
+}
+
+function renderProducts() {
+  const grid = document.getElementById('products-grid');
+  if (!grid) return;
+  const filtered = PRODUCTS.filter(p => p.cat === currentCat);
+  grid.innerHTML = filtered.map(p => `
+    <div class="product-card ${p.color === 'yellow' ? 'yellow-card' : ''}">
+      ${p.promo ? `<div class="badge-promo">${p.promo}</div>` : ''}
+      <div class="card-img ${p.color === 'yellow' ? 'yellow-bg' : ''}">${p.icon}</div>
+      <div class="card-body">
+        <div class="card-cat ${p.color === 'yellow' ? 'yellow' : ''}">${p.cat.toUpperCase()}</div>
+        <div class="card-name">${p.name}</div>
+        <div class="card-desc">${p.desc}</div>
+        <div class="card-footer">
+          <div class="card-price ${p.color === 'yellow' ? 'yellow' : ''}">
+            ${p.oldPrice ? `<small>$${p.oldPrice.toFixed(2)}</small>` : ''}
+            $${p.price.toFixed(2)} USD
+          </div>
+          <button class="btn-add ${p.color === 'yellow' ? 'yellow-btn' : ''}" onclick="addToCart('${p.id}')">
+            + Agregar
+          </button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function addToCart(pid) {
+  const p = PRODUCTS.find(x => x.id === pid);
+  if (!p) return;
+  // rangos: only one
+  if (p.cat === 'rangos') {
+    const hasRango = cart.find(c => PRODUCTS.find(x => x.id === c.id)?.cat === 'rangos');
+    if (hasRango) { showToast('Solo puedes tener un rango en el carrito', true); return; }
+  }
+  if (cart.find(c => c.id === pid)) { showToast('Ya está en el carrito', true); return; }
+  cart.push({ id: pid, name: p.name, price: p.price, icon: p.icon });
+  updateCartUI();
+  showToast(`${p.name} agregado al carrito ✓`);
+}
+
+function removeFromCart(pid) {
+  cart = cart.filter(c => c.id !== pid);
+  updateCartUI();
+  renderCartPanel();
+}
+
+function updateCartUI() {
+  const count = cart.length;
+  const badge = document.getElementById('cart-badge');
+  badge.textContent = count;
+  badge.style.display = count > 0 ? 'flex' : 'none';
+  renderCartPanel();
+}
+
+function renderCartPanel() {
+  const list = document.getElementById('cart-items-list');
+  if (cart.length === 0) {
+    list.innerHTML = '<div class="cart-empty">Tu carrito está vacío</div>';
+    document.getElementById('cart-total-price').textContent = '$0.00 USD';
+    return;
+  }
+  list.innerHTML = cart.map(c => `
+    <div class="cart-item">
+      <div class="cart-item-icon">${c.icon}</div>
+      <div class="cart-item-info">
+        <div class="cart-item-name">${c.name}</div>
+        <div class="cart-item-price">$${c.price.toFixed(2)} USD</div>
+      </div>
+      <button class="btn-remove-item" onclick="removeFromCart('${c.id}')">🗑️</button>
+    </div>
+  `).join('');
+  const total = cart.reduce((s, c) => s + c.price, 0);
+  document.getElementById('cart-total-price').textContent = `$${total.toFixed(2)} USD`;
+}
+
+function toggleCart() {
+  const panel = document.getElementById('cart-panel');
+  const overlay = document.getElementById('cart-overlay');
+  panel.classList.toggle('open');
+  overlay.classList.toggle('open');
+}
+
+function openCheckout() {
+  if (cart.length === 0) { showToast('El carrito está vacío', true); return; }
+  toggleCart();
+  const items = document.getElementById('checkout-items');
+  items.innerHTML = cart.map(c => `
+    <div class="order-item-row">
+      <span>${c.icon} ${c.name}</span>
+      <span style="color:var(--green)">$${c.price.toFixed(2)}</span>
+    </div>
+  `).join('');
+  const total = cart.reduce((s, c) => s + c.price, 0);
+  document.getElementById('checkout-total').textContent = `$${total.toFixed(2)} USD`;
+  document.getElementById('modal-checkout').classList.add('open');
+}
+
+function closeCheckout() {
+  document.getElementById('modal-checkout').classList.remove('open');
+}
+
+function selectPM(pm) {
+  selectedPM = pm;
+  ['nequi','bancolombia','paypal','binance'].forEach(p => {
+    document.getElementById('pm-'+p).classList.toggle('selected', p === pm);
+  });
+}
+
+async function confirmOrder() {
+  if (!currentUser) return;
+  const btn = document.getElementById('btn-confirm-order');
+  btn.disabled = true; btn.textContent = 'Procesando...';
+  try {
+    const total = cart.reduce((s, c) => s + c.price, 0);
+    const orderData = {
+      userId: currentUser.id,
+      username: currentUser.username,
+      items: cart.map(c => ({ id: c.id, name: c.name, price: c.price })),
+      total,
+      paymentMethod: selectedPM,
+      status: 'pending',
+      createdAt: serverTimestamp(),
+      notes: '',
+    };
+    await addDoc(collection(db, 'orders'), orderData);
+    // add notification
+    await addDoc(collection(db, 'notifications'), {
+      userId: currentUser.id,
+      message: `Tu orden de $${total.toFixed(2)} USD está pendiente de aprobación. Método: ${selectedPM.toUpperCase()}`,
+      read: false,
+      createdAt: serverTimestamp(),
+    });
+    cart = [];
+    updateCartUI();
+    closeCheckout();
+    showToast('¡Orden creada! Envía tu comprobante al Discord ✓');
+    loadNotifications();
+  } catch(e) {
+    showToast('Error al crear orden. Intenta de nuevo.', true);
+  }
+  btn.disabled = false; btn.textContent = 'CONFIRMAR ORDEN ✓';
+}
+
+async function loadProfile() {
+  if (!currentUser) return;
+  document.getElementById('prof-name').textContent = currentUser.username;
+  document.getElementById('prof-join').textContent = 'Jugador de TheVenomWorld';
+
+  // orders
+  try {
+    const q = query(collection(db, 'orders'), where('userId', '==', currentUser.id));
+    const snap = await getDocs(q);
+    const orders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+    document.getElementById('stat-orders').textContent = orders.length;
+    const spent = orders.filter(o => o.status === 'completed').reduce((s, o) => s + (o.total || 0), 0);
+    document.getElementById('stat-spent').textContent = `$${spent.toFixed(2)}`;
+
+    // find active rank
+    const rankOrder = orders.find(o => o.status === 'completed' && o.items?.some(i => i.id?.startsWith('r')));
+    if (rankOrder) {
+      const ri = rankOrder.items.find(i => i.id?.startsWith('r'));
+      document.getElementById('stat-rank').textContent = ri?.name?.replace('Rango ', '') || '—';
+    }
+
+    if (orders.length === 0) {
+      document.getElementById('orders-list').innerHTML = `<p style="color:var(--text2);font-size:.9rem">No tienes órdenes aún.</p>`;
+      return;
+    }
+
+    document.getElementById('orders-list').innerHTML = orders.sort((a,b) => {
+      const ta = a.createdAt?.seconds || 0, tb = b.createdAt?.seconds || 0;
+      return tb - ta;
+    }).map(o => `
+      <div class="order-row">
+        <div style="flex:1">
+          <div style="font-weight:600;font-size:.9rem;color:var(--white)">${o.items?.map(i=>i.name).join(', ')}</div>
+          <div style="font-size:.75rem;color:var(--text2);margin-top:.2rem">${o.paymentMethod?.toUpperCase()} · $${(o.total||0).toFixed(2)} USD</div>
+        </div>
+        <div class="order-status status-${o.status || 'pending'}">
+          ${o.status === 'pending' ? '⏳ PENDIENTE' : o.status === 'completed' ? '✓ COMPLETADA' : '✗ RECHAZADA'}
+        </div>
+      </div>
+    `).join('');
+  } catch(e) {}
+}
+
+async function loadNotifications() {
+  if (!currentUser) return;
+  try {
+    const q = query(collection(db, 'notifications'), where('userId', '==', currentUser.id));
+    const snap = await getDocs(q);
+    const notifs = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+      .sort((a,b) => (b.createdAt?.seconds||0) - (a.createdAt?.seconds||0));
+
+    const unread = notifs.filter(n => !n.read).length;
+    const badge = document.getElementById('notif-badge');
+    badge.textContent = unread;
+    badge.style.display = unread > 0 ? 'flex' : 'none';
+
+    const list = document.getElementById('notif-list');
+    if (notifs.length === 0) {
+      list.innerHTML = '<div class="notif-item" style="color:var(--text2)">No hay notificaciones.</div>';
+      return;
+    }
+    list.innerHTML = notifs.slice(0, 10).map(n => `
+      <div class="notif-item ${!n.read ? 'unread' : ''}">
+        <div>${n.message}</div>
+        <div class="notif-time">${n.createdAt ? new Date(n.createdAt.seconds * 1000).toLocaleDateString('es-CO') : ''}</div>
+      </div>
+    `).join('');
+  } catch(e) {}
+}
+
+function toggleNotif() {
+  const dd = document.getElementById('notif-dropdown');
+  dd.classList.toggle('open');
+  // mark as read
+  if (dd.classList.contains('open') && currentUser) {
+    setTimeout(async () => {
+      const q = query(collection(db, 'notifications'), where('userId', '==', currentUser.id), where('read', '==', false));
+      const snap = await getDocs(q);
+      snap.docs.forEach(d => updateDoc(d.ref, { read: true }));
+      document.getElementById('notif-badge').style.display = 'none';
+    }, 1500);
+  }
+}
+
+// close notif on outside click
+document.addEventListener('click', e => {
+  if (!e.target.closest('#btn-notif') && !e.target.closest('#notif-dropdown')) {
+    document.getElementById('notif-dropdown').classList.remove('open');
+  }
+});
+
+tryAutoLogin();
+</script>
+</body>
+</html>
